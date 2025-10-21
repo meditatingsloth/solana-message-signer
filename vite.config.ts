@@ -1,9 +1,19 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { createHtmlPlugin } from 'vite-plugin-html'
 import path from 'path'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    createHtmlPlugin({
+      inject: {
+        data: {
+          siteUrl: process.env.VITE_SITE_URL || 'https://solana-message-signer.pages.dev',
+        },
+      },
+    }),
+  ],
   define: {
     'process.env': {},
     global: 'globalThis',
