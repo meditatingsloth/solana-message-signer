@@ -2,6 +2,8 @@
 
 A simple tool that allows users to sign and verify messages using their Solana wallet. Built with React, TypeScript, and Solana Wallet Adapter.
 
+[Demo Page](https://solana-message-signer.pages.dev/)
+
 ## Features
 
 - **Message Signing**: Connect your Solana wallet and sign any text message
