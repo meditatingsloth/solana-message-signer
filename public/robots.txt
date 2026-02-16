@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /?m=
+Disallow: /?s=
+Disallow: /?w=
+
+Sitemap: https://solana-message-signer.pages.dev/sitemap.xml

@@ -1,7 +1,6 @@
 import { FC, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import bs58 from "bs58";
 import {
   Card,
   CardContent,
@@ -15,7 +14,9 @@ import { Label } from "@/components/ui/label";
 import CopyButton from "./CopyButton";
 import { Loader2, Link as LinkIcon, AlertTriangle } from "lucide-react";
 
-const params = new URLSearchParams(window.location.search);
+const params = typeof window !== "undefined"
+  ? new URLSearchParams(window.location.search)
+  : new URLSearchParams();
 
 const MessageSigner: FC = () => {
   const { publicKey, signMessage } = useWallet();
@@ -48,6 +49,7 @@ const MessageSigner: FC = () => {
       const signatureBytes = await signMessage(encodedMessage);
 
       // Encode signature as base58 string for display
+      const bs58 = (await import("bs58")).default;
       const signatureBase58 = bs58.encode(signatureBytes);
 
       setSignature(signatureBase58);

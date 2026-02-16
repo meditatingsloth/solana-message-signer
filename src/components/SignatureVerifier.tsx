@@ -16,7 +16,9 @@ import { Label } from "@/components/ui/label";
 import { Loader2, CheckCircle2, XCircle, Check, Copy } from "lucide-react";
 
 const SignatureVerifier: FC = () => {
-  const params = new URLSearchParams(window.location.search);
+  const params = typeof window !== "undefined"
+    ? new URLSearchParams(window.location.search)
+    : new URLSearchParams();
   const [message, setMessage] = useState(params.get("m") ?? "");
   const [signature, setSignature] = useState(params.get("s") ?? "");
   const [walletAddress, setWalletAddress] = useState(params.get("w") ?? "");
