@@ -20,7 +20,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 
 const getInitialTab = () => {
   const params = new URLSearchParams(window.location.search);
-  return params.has("s") || params.has("w") ? "verify" : "sign";
+  const tab = params.get("tab");
+  if (tab === "sign" || tab === "verify") return tab;
+  return params.has("s") ? "verify" : "sign";
 };
 
 const TabsSection: FC = () => {
@@ -100,8 +102,7 @@ const App: FC = () => {
                         className="text-brand-primary hover:underline"
                       >
                         @meditatingsloth
-                      </a>{" "}
-                      (Claude)
+                      </a>
                     </span>
                     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-brand-primary/30 to-transparent"></div>
                   </div>

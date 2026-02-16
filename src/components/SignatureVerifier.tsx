@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Check, Copy } from "lucide-react";
 
 const SignatureVerifier: FC = () => {
   const params = new URLSearchParams(window.location.search);
@@ -25,6 +25,17 @@ const SignatureVerifier: FC = () => {
   );
   const [error, setError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [copiedRequest, setCopiedRequest] = useState(false);
+
+  const handleCopyRequestLink = async () => {
+    const url = new URL(window.location.origin);
+    url.searchParams.set("tab", "sign");
+    url.searchParams.set("m", message);
+    url.searchParams.set("w", walletAddress);
+    await navigator.clipboard.writeText(url.toString());
+    setCopiedRequest(true);
+    setTimeout(() => setCopiedRequest(false), 2000);
+  };
 
   const handleVerify = async () => {
     try {
@@ -90,10 +101,32 @@ const SignatureVerifier: FC = () => {
   return (
     <Card className="h-full bg-brand-light/15">
       <CardHeader>
-        <CardTitle className="text-3xl">Verify Signature</CardTitle>
-        <CardDescription className="text-brand-light/60">
-          Check if a signature is valid for a message
-        </CardDescription>
+        <div className="flex items-start justify-between">
+          <div>
+            <CardTitle className="text-3xl">Verify Signature</CardTitle>
+            <CardDescription className="text-brand-light/60 mt-1.5">
+              Check if a signature is valid for a message
+            </CardDescription>
+          </div>
+          {message.trim() && walletAddress.trim() && (
+            <button
+              onClick={handleCopyRequestLink}
+              className="flex items-center gap-1.5 text-xs text-brand-primary hover:text-brand-primary/80 transition-colors shrink-0 mt-1"
+            >
+              {copiedRequest ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-brand-accent" />
+                  <span className="text-brand-accent">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5" />
+                  Copy request link
+                </>
+              )}
+            </button>
+          )}
+        </div>
       </CardHeader>
 
       <CardContent className="space-y-6">

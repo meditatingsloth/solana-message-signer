@@ -13,13 +13,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import CopyButton from "./CopyButton";
-import { Loader2, Link as LinkIcon } from "lucide-react";
+import { Loader2, Link as LinkIcon, AlertTriangle } from "lucide-react";
+
+const params = new URLSearchParams(window.location.search);
 
 const MessageSigner: FC = () => {
   const { publicKey, signMessage } = useWallet();
-  const [message, setMessage] = useState(
-    () => new URLSearchParams(window.location.search).get("m") ?? ""
-  );
+  const [message, setMessage] = useState(params.get("m") ?? "");
+  const intendedWallet = params.get("w");
   const [signature, setSignature] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -72,6 +73,18 @@ const MessageSigner: FC = () => {
           <WalletMultiButton className="!bg-brand-primary hover:!bg-brand-primary/90 !rounded-md !h-10" />
         </div>
 
+        {intendedWallet && publicKey && publicKey.toBase58() !== intendedWallet && (
+          <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg flex items-start gap-2.5">
+            <AlertTriangle className="w-4 h-4 text-yellow-500 shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="text-yellow-500 font-medium">Wallet mismatch</p>
+              <p className="text-yellow-500/80 text-xs mt-0.5">
+                Expected <span className="font-mono">{intendedWallet.slice(0, 4)}...{intendedWallet.slice(-4)}</span> but connected <span className="font-mono">{publicKey.toBase58().slice(0, 4)}...{publicKey.toBase58().slice(-4)}</span>
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
           <Label>Message to Sign</Label>
           <Textarea
@@ -117,10 +130,6 @@ const MessageSigner: FC = () => {
             </p>
 
             <div className="pt-2 border-t border-brand-accent/20">
-              <Label className="text-sm text-brand-accent mb-2 flex items-center gap-1.5">
-                <LinkIcon className="w-3.5 h-3.5" />
-                Verification Link
-              </Label>
               {(() => {
                 const url = new URL(window.location.origin);
                 url.searchParams.set("m", message);
@@ -128,12 +137,18 @@ const MessageSigner: FC = () => {
                 url.searchParams.set("s", signature);
                 const verifyUrl = url.toString();
                 return (
-                  <div className="flex items-center gap-2">
-                    <p className="text-brand-light font-mono text-xs break-all bg-brand-dark/30 p-3 rounded flex-1 min-w-0">
+                  <>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-sm text-brand-accent flex items-center gap-1.5">
+                        <LinkIcon className="w-3.5 h-3.5" />
+                        Verification Link
+                      </Label>
+                      <CopyButton text={verifyUrl} />
+                    </div>
+                    <p className="text-brand-light font-mono text-xs break-all bg-brand-dark/30 p-3 rounded">
                       {verifyUrl}
                     </p>
-                    <CopyButton text={verifyUrl} size="icon" className="shrink-0" />
-                  </div>
+                  </>
                 );
               })()}
             </div>
