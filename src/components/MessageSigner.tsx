@@ -13,11 +13,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import CopyButton from "./CopyButton";
-import { Loader2 } from "lucide-react";
+import { Loader2, Link as LinkIcon } from "lucide-react";
 
 const MessageSigner: FC = () => {
   const { publicKey, signMessage } = useWallet();
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(
+    () => new URLSearchParams(window.location.search).get("m") ?? ""
+  );
   const [signature, setSignature] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -70,24 +72,6 @@ const MessageSigner: FC = () => {
           <WalletMultiButton className="!bg-brand-primary hover:!bg-brand-primary/90 !rounded-md !h-10" />
         </div>
 
-        {publicKey && (
-          <div className="p-4 bg-brand-accent/10 border border-brand-accent/30 rounded-lg">
-            <Label className="text-xs text-brand-accent mb-1 block">
-              Connected Wallet
-            </Label>
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-brand-light font-mono text-sm break-all">
-                {publicKey.toBase58()}
-              </p>
-              <CopyButton
-                text={publicKey.toBase58()}
-                size="icon"
-                className="shrink-0"
-              />
-            </div>
-          </div>
-        )}
-
         <div className="space-y-2">
           <Label>Message to Sign</Label>
           <Textarea
@@ -122,15 +106,37 @@ const MessageSigner: FC = () => {
           </div>
         )}
 
-        {signature && (
-          <div className="p-4 bg-brand-primary/10 border border-brand-primary/30 rounded-lg space-y-3">
+        {signature && publicKey && (
+          <div className="p-4 bg-brand-accent/10 border border-brand-accent/30 rounded-lg space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-sm text-brand-primary">Signature</Label>
+              <Label className="text-sm text-brand-accent">Signature</Label>
               <CopyButton text={signature} />
             </div>
             <p className="text-brand-light font-mono text-xs break-all bg-brand-dark/30 p-3 rounded">
               {signature}
             </p>
+
+            <div className="pt-2 border-t border-brand-accent/20">
+              <Label className="text-sm text-brand-accent mb-2 flex items-center gap-1.5">
+                <LinkIcon className="w-3.5 h-3.5" />
+                Verification Link
+              </Label>
+              {(() => {
+                const url = new URL(window.location.origin);
+                url.searchParams.set("m", message);
+                url.searchParams.set("w", publicKey.toBase58());
+                url.searchParams.set("s", signature);
+                const verifyUrl = url.toString();
+                return (
+                  <div className="flex items-center gap-2">
+                    <p className="text-brand-light font-mono text-xs break-all bg-brand-dark/30 p-3 rounded flex-1 min-w-0">
+                      {verifyUrl}
+                    </p>
+                    <CopyButton text={verifyUrl} size="icon" className="shrink-0" />
+                  </div>
+                );
+              })()}
+            </div>
           </div>
         )}
       </CardContent>

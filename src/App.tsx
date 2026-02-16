@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, useMemo, useState } from "react";
 import {
   ConnectionProvider,
   WalletProvider,
@@ -16,6 +16,41 @@ import {
 import "@solana/wallet-adapter-react-ui/styles.css";
 import MessageSigner from "./components/MessageSigner";
 import SignatureVerifier from "./components/SignatureVerifier";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
+
+const getInitialTab = () => {
+  const params = new URLSearchParams(window.location.search);
+  return params.has("s") || params.has("w") ? "verify" : "sign";
+};
+
+const TabsSection: FC = () => {
+  const [tab, setTab] = useState(getInitialTab);
+
+  return (
+    <Tabs value={tab} onValueChange={setTab} className="max-w-2xl mx-auto mb-16">
+      <TabsList className="grid w-full grid-cols-2 bg-brand-dark/50 border border-brand-primary/20">
+        <TabsTrigger
+          value="sign"
+          className="data-[state=active]:bg-brand-primary data-[state=active]:text-white text-brand-light/70"
+        >
+          Sign
+        </TabsTrigger>
+        <TabsTrigger
+          value="verify"
+          className="data-[state=active]:bg-brand-primary data-[state=active]:text-white text-brand-light/70"
+        >
+          Verify
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="sign">
+        <MessageSigner />
+      </TabsContent>
+      <TabsContent value="verify">
+        <SignatureVerifier />
+      </TabsContent>
+    </Tabs>
+  );
+};
 
 const App: FC = () => {
   // Use mainnet-beta for production, devnet for development
@@ -50,10 +85,7 @@ const App: FC = () => {
                 </p>
               </header>
 
-              <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto mb-16">
-                <MessageSigner />
-                <SignatureVerifier />
-              </div>
+              <TabsSection />
 
               <footer className="mt-20 text-center">
                 <div className="max-w-2xl mx-auto space-y-4">

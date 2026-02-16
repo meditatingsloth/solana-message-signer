@@ -16,9 +16,10 @@ import { Label } from "@/components/ui/label";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 
 const SignatureVerifier: FC = () => {
-  const [message, setMessage] = useState("");
-  const [signature, setSignature] = useState("");
-  const [walletAddress, setWalletAddress] = useState("");
+  const params = new URLSearchParams(window.location.search);
+  const [message, setMessage] = useState(params.get("m") ?? "");
+  const [signature, setSignature] = useState(params.get("s") ?? "");
+  const [walletAddress, setWalletAddress] = useState(params.get("w") ?? "");
   const [verificationResult, setVerificationResult] = useState<boolean | null>(
     null
   );
